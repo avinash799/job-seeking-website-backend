@@ -25,7 +25,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: [true, "Please provide your password"],
         minLength: [3, "Password must contain at least 3 character"],
-        maxLength: [30, "Password cannot exceed 30 character!"],
+        maxLength: [100, "Password cannot exceed 30 character!"],
         select: false,
     },
     role: {
@@ -84,23 +84,40 @@ userSchema.methods.isPasswordCorrect = async function
 //jwt bearer token hota hai -> jo usko bear krta usko data bhej dega
 //jwt token dono
 // Method to generate access token
+// userSchema.methods.generateAccessToken = function () {
+//     return jwt.sign(
+//         {
+
+//             _id: this._id,
+//             email: this.email,
+//             username: this.username,
+//             fullName: this.fullName
+
+//         },
+//         process.env.ACCESS_TOKEN_SECRET,
+//         //expiresIn object ke andar jata hai
+//         {
+//             expiresIn: process.env.JWT_EXPIRE
+//         }
+//     )
+// }
 userSchema.methods.generateAccessToken = function () {
     return jwt.sign(
         {
-
             _id: this._id,
             email: this.email,
             username: this.username,
             fullName: this.fullName
-
         },
-        process.env.ACCESS_TOKEN_SECRET,
-        //expiresIn object ke andar jata hai
+        process.env.JWT_SECRET_KEY,  // Use the correct JWT_SECRET_KEY from .env
         {
-            expiresIn: process.env.JWT_EXPIRE
+            expiresIn: process.env.JWT_EXPIRE || '7d'  // JWT expiration (7 days in this case)
         }
-    )
-}
+    );
+};
+
+
+
 //both are jwt token->refersh token and access token
 userSchema.methods.generateRefreshToken = function () {
     jwt.sign(
